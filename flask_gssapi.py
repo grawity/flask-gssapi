@@ -80,6 +80,7 @@ class GSSAPI(object):
                 username, out_token = self.authenticate()
                 if username:
                     if not users or username in users:
+                        request.environ['REMOTE_USER'] = username
                         response = make_response(view_func(*args,
                                                            username=username,
                                                            **kwargs))
