@@ -62,11 +62,11 @@ class GSSAPI(object):
 
         return None, None
 
-    def require_auth(self):
+    def require_auth(self, *, username_arg='username'):
         """A decorator to protect views with Negotiate authentication."""
-        return self.require_user()
+        return self.require_user(username_arg=username_arg)
 
-    def require_user(self, *users, user=None):
+    def require_user(self, *users, user=None, username_arg='username'):
         """A decorator to protect views with Negotiate authentication."""
 
         # accept old-style single user keyword-argument as well
@@ -81,9 +81,9 @@ class GSSAPI(object):
                 if username:
                     if not users or username in users:
                         request.environ['REMOTE_USER'] = username
-                        response = make_response(view_func(*args,
-                                                           username=username,
-                                                           **kwargs))
+                        if username_arg:
+                            kwargs[username_arg] = username
+                        response = make_response(view_func(*args, **kwargs))
                     else:
                         response = Response(status=403)
                     if out_token:
